@@ -4,14 +4,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.security.config.Customizer.withDefaults
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.security.web.SecurityFilterChain
 
 @EnableWebSecurity
-class WebSecurityConfig : WebSecurityConfigurerAdapter() {
+class WebSecurityConfig {
 
     @Bean
     fun defaultSecurityFilterChain(http: HttpSecurity): SecurityFilterChain =
@@ -22,8 +21,8 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     fun users(): UserDetailsService =
         InMemoryUserDetailsManager(
             User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("password")
+                .username("user")
+                .password("user")
                 .roles("USER")
                 .build()
         )

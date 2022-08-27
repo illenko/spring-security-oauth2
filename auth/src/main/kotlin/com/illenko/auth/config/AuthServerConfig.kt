@@ -38,15 +38,15 @@ class AuthServerConfig {
     @Bean
     fun registeredClientRepository(): RegisteredClientRepository = InMemoryRegisteredClientRepository(
         RegisteredClient.withId(UUID.randomUUID().toString())
-            .clientId("articles-client")
+            .clientId("client")
             .clientSecret("{noop}secret")
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/articles-client-oidc")
+            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/client-oidc")
             .redirectUri("http://127.0.0.1:8080/authorized")
             .scope(OidcScopes.OPENID)
-            .scope("articles.read")
+            .scope("read")
             .build()
     )
 
