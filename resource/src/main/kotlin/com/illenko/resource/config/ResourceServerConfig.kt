@@ -13,7 +13,7 @@ class ResourceServerConfig {
         http.mvcMatcher("/test/**")
             .authorizeRequests()
             .mvcMatchers("/test/**")
-            .access("hasAuthority('SCOPE_read')")
+            .access("hasAuthority('SCOPE_backend.read')")
             .and()
             .oauth2ResourceServer()
             .jwt()

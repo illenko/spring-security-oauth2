@@ -1,5 +1,6 @@
 package com.illenko.auth.config
 
+import com.nimbusds.jose.jwk.JWKSelector
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.source.JWKSource
@@ -30,36 +31,55 @@ class AuthServerConfig {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    fun authServerSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    @Throws(
+        Exception::class
+    )
+    fun authServerSecurityFilterChain(http: HttpSecurity): SecurityFilterChain? {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http)
         return http.formLogin(Customizer.withDefaults()).build()
     }
 
     @Bean
-    fun registeredClientRepository(): RegisteredClientRepository = InMemoryRegisteredClientRepository(
-        RegisteredClient.withId(UUID.randomUUID().toString())
-            .clientId("client")
+    fun registeredClientRepository(): RegisteredClientRepository? {
+        val registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+            .clientId("backend-client")
             .clientSecret("{noop}secret")
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/client-oidc")
+            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/backend-client-oidc")
             .redirectUri("http://127.0.0.1:8080/authorized")
             .scope(OidcScopes.OPENID)
-            .scope("read")
+            .scope("backend.read")
             .build()
-    )
+        return InMemoryRegisteredClientRepository(registeredClient)
+    }
 
     @Bean
-    fun jwkSource(): JWKSource<SecurityContext> =
-        JWKSource<SecurityContext> { jwkSelector, _ -> jwkSelector.select(JWKSet(generateRsa())) }
+    fun jwkSource(): JWKSource<SecurityContext?>? {
+        val rsaKey = generateRsa()
+        val jwkSet = JWKSet(rsaKey)
+        return JWKSource { jwkSelector: JWKSelector, securityContext: SecurityContext? ->
+            jwkSelector.select(
+                jwkSet
+            )
+        }
+    }
 
-    @Bean
-    fun providerSettings(): ProviderSettings = ProviderSettings.builder().issuer("http://auth-server:9000").build()
+    private fun generateRsa(): RSAKey {
+        val keyPair = generateRsaKey()
+        val publicKey = keyPair.public as RSAPublicKey
+        val privateKey = keyPair.private as RSAPrivateKey
+        return RSAKey.Builder(publicKey)
+            .privateKey(privateKey)
+            .keyID(UUID.randomUUID().toString())
+            .build()
+    }
 
     private fun generateRsaKey(): KeyPair {
-        val keyPair: KeyPair = try {
-            val keyPairGenerator: KeyPairGenerator = KeyPairGenerator.getInstance("RSA")
+        val keyPair: KeyPair
+        keyPair = try {
+            val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
             keyPairGenerator.initialize(2048)
             keyPairGenerator.generateKeyPair()
         } catch (ex: Exception) {
@@ -68,11 +88,10 @@ class AuthServerConfig {
         return keyPair
     }
 
-    private fun generateRsa(): RSAKey {
-        val keyPair: KeyPair = generateRsaKey()
-        return RSAKey.Builder(keyPair.public as RSAPublicKey)
-            .privateKey(keyPair.private as RSAPrivateKey)
-            .keyID(UUID.randomUUID().toString())
+    @Bean
+    fun providerSettings(): ProviderSettings? {
+        return ProviderSettings.builder()
+            .issuer("http://auth-server:9000")
             .build()
     }
 }

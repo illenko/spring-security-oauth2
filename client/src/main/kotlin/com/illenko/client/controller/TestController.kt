@@ -13,7 +13,7 @@ class TestController(private val webClient: WebClient) {
 
     @GetMapping(value = ["/test"])
     fun test(
-        @RegisteredOAuth2AuthorizedClient("client-authorization-code") authorizedClient: OAuth2AuthorizedClient
+        @RegisteredOAuth2AuthorizedClient("backend-client-authorization-code") authorizedClient: OAuth2AuthorizedClient
     ): Array<String> {
         return webClient
             .get()
