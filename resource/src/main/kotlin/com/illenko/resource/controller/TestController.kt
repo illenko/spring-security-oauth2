@@ -6,5 +6,5 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class TestController {
     @GetMapping("/test")
-    fun getArticles() = listOf("Test 1", "Test 2", "Test 3")
+    fun test() = listOf("Test 1", "Test 2", "Test 3")
 }
