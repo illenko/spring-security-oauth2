@@ -6,7 +6,7 @@ spring:
     oauth2:
       client:
         registration:
-          articles-client-oidc:
+          client-oidc:
             provider: spring
             client-id: client
             client-secret: secret
@@ -14,7 +14,7 @@ spring:
             redirect-uri: "http://127.0.0.1:8080/login/oauth2/code/{registrationId}"
             scope: openid
             client-name: client-oidc
-          articles-client-authorization-code:
+          client-authorization-code:
             provider: spring
             client-id: client
             client-secret: secret
